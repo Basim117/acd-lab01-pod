@@ -1,0 +1,69 @@
+# ACD Lab 01 online pod: a small copy of the per-student pod LAN (10.10.10.0/24).
+# "internal: true" means the network has no route to the internet.
+name: acdpod
+
+networks:
+  podlan:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+          gateway: 10.10.10.1      # the Codespace itself; stands in for fw01
+
+services:
+  kali:
+    build:
+      context: ./images/kali
+    container_name: kali
+    hostname: kali-analyst
+    networks:
+      podlan:
+        ipv4_address: 10.10.10.10
+    cap_add: [NET_ADMIN, NET_RAW]
+    volumes:
+      - ./evidence:/root/lab01/evidence
+    stdin_open: true
+    tty: true
+
+  web01:
+    build: ./images/web01
+    container_name: web01
+    hostname: web01
+    networks:
+      podlan:
+        ipv4_address: 10.10.10.20
+
+  win01:
+    # Linux stand-in for the Windows client: SMB file sharing, and it ignores
+    # ping the way Windows Firewall does by default.
+    build: ./images/win01
+    container_name: win01
+    hostname: win01
+    sysctls:
+      net.ipv4.icmp_echo_ignore_all: 1
+    networks:
+      podlan:
+        ipv4_address: 10.10.10.30
+
+  legacy01:
+    # Metasploitable 2: deliberately vulnerable. It stays on the internal network only.
+    image: tleemcjr/metasploitable2:latest
+    container_name: legacy01
+    hostname: legacy01
+    command: ["sh", "-c", "/bin/services.sh && bash"]
+    stdin_open: true
+    tty: true
+    networks:
+      podlan:
+        ipv4_address: 10.10.10.40
+
+  dev:
+    # Optional unannounced host (instructor turns it on with: ./pod surprise)
+    profiles: [surprise]
+    build: ./images/dev
+    container_name: dev
+    hostname: dev
+    networks:
+      podlan:
+        ipv4_address: 10.10.10.60

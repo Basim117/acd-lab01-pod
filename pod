@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Helper for the ACD Lab 01 online pod. Run from the repository folder.
+set -euo pipefail
+cd "$(dirname "$0")"
+
+case "${1:-help}" in
+  up)       docker compose up -d --build ;;
+  start)    docker compose start 2>/dev/null || docker compose up -d ;;
+  kali)     docker compose exec kali bash ;;
+  status)   docker compose ps --format 'table {{.Name}}\t{{.Status}}' ;;
+  reset)    docker compose down --remove-orphans && docker compose up -d --build
+            echo "Pod rebuilt from clean images. Your evidence folder was kept." ;;
+  surprise) docker compose --profile surprise up -d dev
+            echo "Unannounced host started at 10.10.10.60." ;;
+  down)     docker compose --profile surprise down ;;
+  *)        cat <<'USAGE'
+Usage: ./pod <command>
+  up        build and start the pod (runs automatically when the Codespace is created)
+  kali      open a shell on Kali-Analyst (10.10.10.10) - do the lab from here
+  status    show which pod hosts are running
+  reset     rebuild every host from a clean image (like reverting a snapshot); evidence is kept
+  surprise  instructor option: start an unannounced host at 10.10.10.60
+  down      stop and remove the pod
+USAGE
+  ;;
+esac
