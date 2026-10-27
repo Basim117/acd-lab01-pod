@@ -1,0 +1,20 @@
+{
+  "name": "ACD Lab 01 - Online Pod",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "8gb"
+  },
+  "postCreateCommand": "chmod +x pod && ./pod up",
+  "postStartCommand": "chmod +x pod && ./pod start",
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "README.md"
+      ]
+    }
+  }
+}
