@@ -8,7 +8,7 @@
     "cpus": 2,
     "memory": "8gb"
   },
-  "postCreateCommand": "chmod +x pod && ./pod up",
+       "postCreateCommand": "(command -v zip >/dev/null || (sudo apt-get update && sudo apt-get install -y zip)); chmod +x pod && ./pod up",
   "postStartCommand": "chmod +x pod && ./pod start",
   "customizations": {
     "codespaces": {
